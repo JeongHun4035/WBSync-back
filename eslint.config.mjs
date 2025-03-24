@@ -30,7 +30,10 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-argument': 'warn',
       '@typescript-eslint/no-floating-promises': 'off',
-      'linebreak-style': 0,
+      'linebreak-style': 'off', // 줄 끝 체크 안 함
+      'import/no-unresolved': 'off', // 필요 시
+      'prettier/prettier': 'off',
+      'import/extensions': 'off',
     },
   },
 );
