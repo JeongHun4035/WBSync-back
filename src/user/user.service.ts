@@ -11,10 +11,10 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
 
-  createUser(dto: CreateUserDto) {
-    const user = this.userRepository.create(dto);
-    return this.userRepository.save(user);
-  }
+async createUser(dto: CreateUserDto): Promise<User> {
+  const user = this.userRepository.create(dto)
+  return this.userRepository.save(user)
+}
 
   findAll() {
     return this.userRepository.find();
