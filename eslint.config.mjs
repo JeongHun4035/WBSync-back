@@ -34,6 +34,9 @@ export default tseslint.config(
       'import/no-unresolved': 'off', // 필요 시
       'prettier/prettier': 'off',
       'import/extensions': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
     },
   },
 );
