@@ -23,4 +23,8 @@ export class UserService {
   async findById(id: string) {
     return this.userRepository.findOneBy({ id });
   }
+
+  async updateRefreshToken(id: string, token: string) {
+    return this.userRepository.update({ id }, { refreshToken: token });
+  }
 }

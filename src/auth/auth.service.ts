@@ -18,6 +18,7 @@ export class AuthService {
   async signin(dto: LoginDto): Promise<{
     message: string;
     accessToken: string;
+    refreshToken: string;
     user: {
       id: string;
       name: string;
@@ -41,11 +42,20 @@ export class AuthService {
       phoneNumber: user.phoneNumber,
     };
 
-    const accessToken = await this.jwtService.signAsync(payload);
+    const accessToken = await this.jwtService.signAsync(payload, {
+      expiresIn: "1h",
+    });
+
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      expiresIn: "7d",
+    });
+
+    await this.userService.updateRefreshToken(user.id, refreshToken);
 
     return {
       message: "로그인 성공",
       accessToken,
+      refreshToken,
       user: {
         id: user.id,
         name: user.name,
