@@ -3,6 +3,7 @@ import { ConfigModule } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserModule } from "./user/user.module";
 import { AuthModule } from "./auth/auth.module";
+import { MenuModule } from "./menu/menu.module";
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -20,6 +21,7 @@ import { AuthModule } from "./auth/auth.module";
     }),
     UserModule,
     AuthModule,
+    MenuModule,
   ],
 })
 export class AppModule {}
