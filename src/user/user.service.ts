@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Repository, Like } from "typeorm";
 import { User } from "./user.entity";
 import { CreateUserDto } from "./dto/create-user.dto";
 
@@ -18,6 +18,17 @@ export class UserService {
 
   findAll() {
     return this.userRepository.find();
+  }
+
+  async searchUsers(keyword: string): Promise<User[]> {
+    return this.userRepository.find({
+      where: [
+        { id: Like(`%${keyword}%`) },
+        { name: Like(`%${keyword}%`) },
+        { email: Like(`%${keyword}%`) },
+        { phoneNumber: Like(`%${keyword}%`) },
+      ],
+    });
   }
 
   async findById(id: string) {

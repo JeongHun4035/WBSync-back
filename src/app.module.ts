@@ -4,6 +4,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserModule } from "./user/user.module";
 import { AuthModule } from "./auth/auth.module";
 import { MenuModule } from "./menu/menu.module";
+import { ManagementModule } from "./management/user/management.module";
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -22,6 +23,7 @@ import { MenuModule } from "./menu/menu.module";
     UserModule,
     AuthModule,
     MenuModule,
+    ManagementModule,
   ],
 })
 export class AppModule {}
