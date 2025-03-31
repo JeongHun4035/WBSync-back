@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
@@ -34,4 +35,7 @@ export class User {
 
   @Column()
   phoneNumber: string;
+
+  @Column({ nullable: true })
+  refreshToken: string;
 }

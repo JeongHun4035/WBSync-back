@@ -1,4 +1,6 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Post, UnauthorizedException } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { UserService } from "src/user/user.service";
 import { AuthService } from "./auth.service";
 import { SignUpDto } from "./dto/signup.dto";
 import { throwBadRequest } from "src/common/utils/http-exception.util";
@@ -6,7 +8,11 @@ import { LoginDto } from "./dto/signin.dto";
 
 @Controller("auth")
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly jwtService: JwtService,
+    private readonly userService: UserService,
+  ) {}
 
   @Post("sign-up")
   signup(@Body() dto: SignUpDto) {
@@ -102,5 +108,37 @@ export class AuthController {
       throwBadRequest("비밀번호를 입력해주세요.", "REQUIRED_PASSWORD");
     }
     return this.authService.signin(dto);
+  }
+
+  @Post("refresh-token")
+  async refresh(@Body("refreshToken") token: string) {
+    try {
+      const payload = this.jwtService.verify(token, {
+        secret: process.env.JWT_SECRET,
+      });
+
+      const user = await this.userService.findById(payload.sub);
+
+      if (!user || user.refreshToken !== token) {
+        throw new UnauthorizedException("토큰이 유효하지 않아요.");
+      }
+
+      const newAccessToken = this.jwtService.sign(
+        {
+          sub: user.id,
+          name: user.name,
+          phoneNumber: user.phoneNumber,
+        },
+        { expiresIn: "1h" },
+      );
+
+      return {
+        message: "토큰 재발급 성공",
+        accessToken: newAccessToken,
+      };
+    } catch (e) {
+      console.error(e);
+      throw new UnauthorizedException("Refresh token이 유효하지 않아요.");
+    }
   }
 }
