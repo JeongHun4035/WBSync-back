@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, Like } from "typeorm";
+import { Repository, Like, FindOptionsWhere  } from "typeorm";
 import { User } from "./user.entity";
 import { CreateUserDto } from "./dto/create-user.dto";
 
@@ -20,16 +20,48 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  async searchUsers(keyword: string): Promise<User[]> {
-    return this.userRepository.find({
-      where: [
-        { id: Like(`%${keyword}%`) },
-        { name: Like(`%${keyword}%`) },
-        { email: Like(`%${keyword}%`) },
-        { phoneNumber: Like(`%${keyword}%`) },
-      ],
-    });
+ async searchUsers(
+  keyword: string,
+  deptCode?: string,
+  rankCode?: string,
+  currentPage = 1,
+  pageLimit = 10,
+): Promise<{ data: User[]; totalCount: number }> {
+  const where: FindOptionsWhere<User>[] = [];
+
+  if (keyword) {
+    where.push(
+      { id: Like(`%${keyword}%`) },
+      { name: Like(`%${keyword}%`) },
+      { email: Like(`%${keyword}%`) },
+    );
   }
+
+  const extraCondition: Partial<User> = {};
+    if (deptCode) extraCondition.deptCode = deptCode;
+    if (rankCode) extraCondition.rankCode = rankCode;
+
+    if (Object.keys(extraCondition).length > 0) {
+      if (where.length > 0) {
+        for (let i = 0; i < where.length; i++) {
+          where[i] = {
+            ...where[i],
+            ...extraCondition,
+          };
+        }
+      } else {
+        where.push(extraCondition as FindOptionsWhere<User>);
+      }
+    }
+
+  const [result, total] = await this.userRepository.findAndCount({
+    where,
+    skip: (currentPage - 1) * pageLimit,
+    take: pageLimit,
+  });
+
+  return { data: result, totalCount: total };
+}
 
   async findById(id: string) {
     return this.userRepository.findOneBy({ id });

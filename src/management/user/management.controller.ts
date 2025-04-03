@@ -6,12 +6,22 @@ export class ManagementController {
   constructor(private readonly userService: UserService) {}
 
   @Get("users")
-  async getAllUsers(@Query("keyword") keyword?: string) {
-    const users = keyword
-      ? await this.userService.searchUsers(keyword)
-      : await this.userService.findAll();
+  async getAllUsers(
+    @Query("keyword") keyword?: string,
+    @Query("deptCode") deptCode?: string,
+    @Query("rankCode") rankCode?: string,
+    @Query("currentPage") currentPage = 1,
+    @Query("pageLimit") pageLimit = 10,
+  ) {
+    const { data, totalCount } = await this.userService.searchUsers(
+      keyword ?? "",
+      deptCode ?? "",
+      rankCode ?? "",
+      currentPage,
+      pageLimit,
+    );
 
-    const filteredUsers = users.map((user) => ({
+    const filteredUsers = data.map(user => ({
       id: user.id,
       name: user.name,
       email: user.email,
@@ -23,7 +33,7 @@ export class ManagementController {
     }));
 
     return {
-      totalCount: filteredUsers.length,
+      totalCount,
       dataList: filteredUsers,
     };
   }
